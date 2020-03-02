@@ -1,6 +1,5 @@
 # Playing with date times and time zones
 
-
 import pytz
 from datetime import datetime
 
@@ -30,25 +29,38 @@ places = {
 }
 
 
-def display_options(places_list: dict):
-    for option, place in places.items():
+def display_options(places_dict: dict):
+    """Prints the key and value of the passed dict"""
+    print("Available options: ")
+    for option, place in places_dict.items():
         if option == 0:
             continue
         print(f"\t{option}. {place}")
 
 
-def display_time(desired_location: int):
-    tz_code = tz_codes[desired_location]
+def display_time(tz_dict: dict, desired_location: int, local_tz_name: str ):
+    """
+    Given a desired location, displays:
+        1. The current UTC time
+        2. The current local time
+        3. The current time for the desired location
+
+    Args:
+        tz_dict [dict]: A dictionary containing the tz names in pytz
+        desired_location [int]: A valid int key in the tz_codes dict
+        local_tz_name [str]: The name of the local tz in pytz
+    """
+    tz_code = tz_dict[desired_location]
     current_utc = datetime.now(tz=pytz.utc)
-    local_time = current_utc.astimezone(pytz.timezone("America/Mexico_City"))
+    local_time = current_utc.astimezone(pytz.timezone(local_tz_name))
     desired_time = current_utc.astimezone(pytz.timezone(tz_code))
-    print(f"\nCurrent UTC time: {current_utc.strftime('%A %B %d, %Y  %I:%M:%S %p')}")
-    print(f"Current local time: {local_time.strftime('%A %B %d, %Y  %I:%M:%S %p')}")
+    print(f"\nCurrent UTC time:\t\t{current_utc.strftime('%A %B %d, %Y  %I:%M:%S %p')}")
+    print(f"Current local time:\t\t{local_time.strftime('%A %B %d, %Y  %I:%M:%S %p')}")
     print(f"Current time in {places[desired_location]}: {desired_time.strftime('%A %B %d, %Y  %I:%M:%S %p')}\n")
 
 
+# Main app loop:
 while True:
-    print("Available options: ")
     display_options(places)
     message = "Enter desired location: "
     location = input(message)
@@ -60,9 +72,9 @@ while True:
         try:
             location = int(location)
         except ValueError:
-            print("That was not a valid option! Try again...")
+            print("\nThat was not a valid option! Try again...\n")
             continue
     if location == 0:
         print("\nGoodbye!\n")
         break
-    display_time(location)
+    display_time(tz_codes, location, "America/Mexico_City")
